@@ -1,0 +1,6 @@
+Streamlit
+pytesseract
+pillow
+opencv-python-headless
+numpy
+ আর এই টা এই দুটো
