@@ -1,33 +1,32 @@
 import streamlit as st
-from PIL import Image
-from ultralytics import YOLO
+import cv2
+import numpy as np
+from PIL import Image, ImageEnhance
 
 st.set_page_config(page_title="CAPTCHA Solver", layout="centered")
 
-st.title("🤖 CAPTCHA Object Detector")
-st.write("ক্যাপচা ছবি আপলোড করলে YOLOv8 মডেল স্বয়ংক্রিয়ভাবে অবজেক্টসমূহ চিহ্নিত করে দেবে।")
+st.title("🧩 CAPTCHA Enhancement Tool")
+st.write("ক্যাপচা ছবি আরও স্পষ্ট দেখতে নিচে আপলোড করুন।")
 
-# Load YOLO Model
-@st.cache_resource
-def load_yolo():
-    return YOLO('yolov8n.pt')
-
-model = load_yolo()
-
-# File Uploader
 uploaded_file = st.file_uploader("ক্যাপচা ছবি আপলোড করুন", type=['png', 'jpg', 'jpeg'])
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
     
-    st.subheader("মূল ছবি")
+    st.subheader("📸 মূল ছবি")
     st.image(image, use_container_width=True)
 
     st.markdown("---")
-    st.subheader("🔍 ডিটেকশন ফলাফল")
+    
+    # Image Enhancements
+    contrast = st.slider("কন্ট্রাস্ট (Contrast) বাড়ান", 1.0, 3.0, 1.5)
+    brightness = st.slider("ব্রাইটনেস (Brightness) বাড়ান", 1.0, 2.5, 1.2)
 
-    with st.spinner("ছবি প্রসেস করা হচ্ছে..."):
-        results = model(image)
-        res_plotted = results[0].plot()
+    enhancer1 = ImageEnhance.Contrast(image)
+    img_enhanced = enhancer1.enhance(contrast)
 
-    st.image(res_plotted, caption="ডিটেক্ট করা অবজেক্টসমূহ", use_container_width=True)
+    enhancer2 = ImageEnhance.Brightness(img_enhanced)
+    final_img = enhancer2.enhance(brightness)
+
+    st.subheader("🔍 প্রসেস করা স্পষ্ট ছবি")
+    st.image(final_img, caption="ক্যাপচা বোঝার সুবিধার্থে ফিল্টার করা ছবি", use_container_width=True)
